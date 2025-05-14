@@ -5,26 +5,23 @@ A full-stack application where users can log in and manage tasks. This applicati
 ## Technologies Used
 
 ### Frontend
-- React.js with Vite
+- React with TypeScript
 - Redux Toolkit for state management
 - React Router for navigation
 - Axios for API requests
 - Tailwind CSS for styling
+- Containerized with Docker & Nginx
 
 ### Backend
 - Express.js with TypeScript for the API
 - PostgreSQL database with Prisma ORM
 - JWT for authentication
 - Swagger for API documentation
+- Containerized with Docker
 
 ## Getting Started
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- Docker and Docker Compose
-
-## Running with Docker (Recommended)
+### Running with Docker (Recommended)
 
 The entire application can be run using Docker Compose:
 
@@ -54,11 +51,9 @@ The entire application can be run using Docker Compose:
    docker-compose up -d
    ```
 
-### Setting Up the Project Locally (Alternative)
+### Local Development
 
-For local development without Docker:
-
-#### Backend Setup
+#### Backend Development
 
 1. Navigate to the backend directory:
    ```
@@ -91,7 +86,7 @@ For local development without Docker:
    npm run dev
    ```
 
-#### Frontend Setup
+#### Frontend Development
 
 1. Navigate to the frontend directory:
    ```
@@ -109,6 +104,19 @@ For local development without Docker:
    ```
 
 4. The frontend will be available at http://localhost:5173
+
+## Application Features
+
+### Authentication
+- User registration and login
+- JWT-based authentication with refresh tokens
+- Secure password hashing
+- Protected routes
+
+### Task Management
+- Create, read, update, and delete tasks
+- Filter tasks by status (Todo, In Progress, Done)
+- Responsive and intuitive UI
 
 ## API Endpoints
 
@@ -129,60 +137,28 @@ For local development without Docker:
 
 For detailed API documentation, visit the Swagger docs at http://localhost:3000/api-docs when the backend is running.
 
-## Application Features
+## Dockerization
 
-1. **User Authentication**
-   - Register a new account
-   - Login with email and password
-   - JWT-based authentication with refresh tokens
-   - Protected routes for authenticated users
+The application is fully containerized using Docker:
 
-2. **Task Management**
-   - Create new tasks with title, description, and status
-   - View all tasks organized by status (To Do, In Progress, Done)
-   - Update task details and status
-   - Delete tasks
+1. **Frontend Container**:
+   - Multi-stage build for optimized production image
+   - Nginx for serving static files and API proxying
+   - Configuration for Single Page Application routing
 
-3. **Frontend UI**
-   - Responsive design using Tailwind CSS
-   - Intuitive user interface
-   - Toast notifications for actions
-   - Form validation
+2. **Backend Container**:
+   - Node.js application with TypeScript
+   - Automatic database migrations at startup
+   - Health checks to ensure availability
 
-## Troubleshooting Docker Issues
-
-1. **Connection issues with PostgreSQL**:
-   - Check if the PostgreSQL container is running: `docker ps`
-   - Verify the connection string in the environment variables
-   - Check container logs: `docker logs taskmanagement-postgres`
-   - PostgreSQL is running on port 5434 to avoid conflicts with local instances
-
-2. **Backend or Frontend container fails to start**:
-   - Check logs: `docker logs taskmanagement-backend` or `docker logs taskmanagement-frontend`
-   - Make sure all environment variables are correctly set
-   - Ensure PostgreSQL is fully initialized before the backend attempts to connect
-
-3. **Database migrations not applying**:
-   - The entrypoint script should automatically run migrations
-   - If issues persist, you can manually trigger migrations:
-     ```
-     docker-compose exec backend npx prisma migrate deploy
-     ```
-
-4. **Frontend not connecting to backend**:
-   - Make sure the API requests are being properly proxied
-   - Check the network settings in docker-compose.yml
-   - Verify the Nginx configuration in the frontend container
-
-5. **Resetting the application**:
-   - Remove all containers: `docker-compose down`
-   - Remove the volume: `docker volume rm taskmanagement-postgres-data`
-   - Start again: `docker-compose up -d`
+3. **PostgreSQL Container**:
+   - Persistent volume for data storage
+   - Health checks to verify database availability
 
 ## Project Structure
 
 ```
-user-auth/
+task-management/
 ├── backend/
 │   ├── prisma/
 │   │   ├── migrations/
@@ -193,62 +169,18 @@ user-auth/
 │   │   ├── routes/
 │   │   ├── utils/
 │   │   └── index.ts
-│   ├── .env
 │   ├── Dockerfile
 │   └── package.json
 ├── frontend/
-│   ├── public/
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
 │   │   ├── services/
 │   │   ├── store/
-│   │   │   └── slices/
-│   │   ├── App.tsx
-│   │   └── main.tsx
+│   │   └── App.tsx
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── package.json
 ├── docker-compose.yml
 └── README.md
 ```
-
-## Implementation Details
-
-### Backend Implementation
-
-The backend is built with Express.js and TypeScript, providing a robust and type-safe API. It uses Prisma ORM for database operations, making it easy to interact with the PostgreSQL database.
-
-Key features of the backend:
-- **User Authentication**: JWT-based authentication with access tokens and refresh tokens
-- **CRUD Operations for Tasks**: Complete API for managing tasks
-- **Error Handling**: Comprehensive error handling with appropriate HTTP status codes
-- **Security**: Password hashing, JWT token verification, and protected routes
-- **Swagger Documentation**: Auto-generated API documentation
-- **Dockerization**: Containerized backend service
-
-### Frontend Implementation
-
-The frontend is built with React and uses Vite for fast development. It includes Redux Toolkit for state management and React Router for navigation.
-
-Key features of the frontend:
-- **Redux State Management**: Centralized state management with Redux Toolkit
-- **User Authentication**: Login, registration, and token management
-- **Task Management Interface**: Create, read, update, and delete tasks
-- **Responsive Design**: Mobile-friendly design with Tailwind CSS
-- **Form Validation**: Validate user inputs and display appropriate error messages
-- **Notifications**: Toast notifications for user feedback
-- **Dockerization**: Containerized frontend service with Nginx
-
-### Dockerization
-
-The application is fully Dockerized and includes the following containers:
-- **PostgreSQL**: Database container with persistent storage
-- **Backend**: Express.js API container
-- **Frontend**: React application served with Nginx
-
-The Docker Compose configuration ensures proper networking between services and sets up the required environment variables.
-
-## License
-
-This project is licensed under the MIT License.
