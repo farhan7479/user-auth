@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios from 'axios';  // Use default axios for now
 
 // Types
 export interface User {
@@ -50,15 +50,22 @@ const initialState: AuthState = {
   message: '',
 };
 
+// Axios instance with the correct baseURL
+const api = axios.create({
+  baseURL: 'http://localhost:3000/api'
+});
+
 // Async thunks
 export const register = createAsyncThunk(
   'auth/register',
   async (userData: RegisterData, thunkAPI) => {
     try {
-      // Fixed API path
-      const response = await axios.post<AuthResponse>('/api/auth/register', userData);
+      console.log('Registering user with data:', userData);
+      const response = await api.post<AuthResponse>('/auth/register', userData);
+      console.log('Registration response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Registration error:', error);
       const message = error.response?.data?.message || error.message || 'Registration failed';
       return thunkAPI.rejectWithValue(message);
     }
@@ -69,8 +76,9 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, thunkAPI) => {
     try {
-      // Fixed API path
-      const response = await axios.post<AuthResponse>('/api/auth/login', credentials);
+      console.log('Logging in with credentials:', credentials);
+      const response = await api.post<AuthResponse>('/auth/login', credentials);
+      console.log('Login response:', response.data);
       
       if (response.data.data) {
         localStorage.setItem('token', response.data.data.accessToken);
@@ -79,6 +87,7 @@ export const login = createAsyncThunk(
       
       return response.data;
     } catch (error: any) {
+      console.error('Login error:', error);
       const message = error.response?.data?.message || error.message || 'Login failed';
       return thunkAPI.rejectWithValue(message);
     }
@@ -100,8 +109,7 @@ export const refreshTokens = createAsyncThunk(
         return thunkAPI.rejectWithValue('No refresh token found');
       }
       
-      // Fixed API path
-      const response = await axios.post('/api/auth/refresh-token', { refreshToken });
+      const response = await api.post('/auth/refresh-token', { refreshToken });
       
       if (response.data.data) {
         localStorage.setItem('token', response.data.data.accessToken);

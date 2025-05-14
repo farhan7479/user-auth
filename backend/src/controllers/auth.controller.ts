@@ -9,6 +9,8 @@ import { ApiError } from '../middleware/error.middleware';
  */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Register request:', req.body);
+    
     const { email, password, name } = req.body;
 
     // Validate input
@@ -41,12 +43,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       },
     });
 
+    console.log('User created:', newUser);
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
       data: newUser,
     });
   } catch (error) {
+    console.error('Registration error:', error);
     next(error);
   }
 };
@@ -56,6 +61,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
  */
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Login request:', req.body);
+    
     const { email, password } = req.body;
 
     // Validate input
@@ -79,6 +86,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const accessToken = generateAccessToken({ userId: user.id, email: user.email });
     const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
 
+    console.log('User logged in:', { id: user.id, email: user.email });
+
     res.status(200).json({
       success: true,
       message: 'User logged in successfully',
@@ -93,6 +102,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       },
     });
   } catch (error) {
+    console.error('Login error:', error);
     next(error);
   }
 };
@@ -130,6 +140,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
       },
     });
   } catch (error) {
+    console.error('Token refresh error:', error);
     next(error);
   }
 };
@@ -165,6 +176,7 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
       data: user,
     });
   } catch (error) {
+    console.error('Get profile error:', error);
     next(error);
   }
 };

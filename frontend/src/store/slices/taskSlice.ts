@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios from 'axios';  // Use default axios for now
 import { RootState } from '..';
 
 // Types
@@ -43,6 +43,11 @@ const initialState: TaskState = {
   message: '',
 };
 
+// Axios instance with the correct baseURL
+const api = axios.create({
+  baseURL: 'http://localhost:3000/api'
+});
+
 // Helper function to set authorization header
 const setAuthHeader = (token: string) => {
   return {
@@ -64,10 +69,12 @@ export const getTasks = createAsyncThunk(
         return thunkAPI.rejectWithValue('Not authenticated');
       }
       
-      // Fixed API path
-      const response = await axios.get('/api/tasks', setAuthHeader(token));
+      console.log('Fetching tasks...');
+      const response = await api.get('/tasks', setAuthHeader(token));
+      console.log('Tasks response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Error fetching tasks:', error);
       const message = error.response?.data?.message || error.message || 'Failed to fetch tasks';
       return thunkAPI.rejectWithValue(message);
     }
@@ -85,10 +92,12 @@ export const createTask = createAsyncThunk(
         return thunkAPI.rejectWithValue('Not authenticated');
       }
       
-      // Fixed API path
-      const response = await axios.post('/api/tasks', taskData, setAuthHeader(token));
+      console.log('Creating task:', taskData);
+      const response = await api.post('/tasks', taskData, setAuthHeader(token));
+      console.log('Create task response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Error creating task:', error);
       const message = error.response?.data?.message || error.message || 'Failed to create task';
       return thunkAPI.rejectWithValue(message);
     }
@@ -106,11 +115,13 @@ export const updateTask = createAsyncThunk(
         return thunkAPI.rejectWithValue('Not authenticated');
       }
       
-      // Fixed API path
       const { id, ...data } = taskData;
-      const response = await axios.put(`/api/tasks/${id}`, data, setAuthHeader(token));
+      console.log('Updating task:', id, data);
+      const response = await api.put(`/tasks/${id}`, data, setAuthHeader(token));
+      console.log('Update task response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Error updating task:', error);
       const message = error.response?.data?.message || error.message || 'Failed to update task';
       return thunkAPI.rejectWithValue(message);
     }
@@ -128,10 +139,11 @@ export const deleteTask = createAsyncThunk(
         return thunkAPI.rejectWithValue('Not authenticated');
       }
       
-      // Fixed API path
-      await axios.delete(`/api/tasks/${id}`, setAuthHeader(token));
+      console.log('Deleting task:', id);
+      await api.delete(`/tasks/${id}`, setAuthHeader(token));
       return id;
     } catch (error: any) {
+      console.error('Error deleting task:', error);
       const message = error.response?.data?.message || error.message || 'Failed to delete task';
       return thunkAPI.rejectWithValue(message);
     }

@@ -10,100 +10,35 @@ A full-stack application where users can log in and manage tasks. This applicati
 - React Router for navigation
 - Axios for API requests
 - Tailwind CSS for styling
-- Containerized with Docker & Nginx
+- Vite for fast development
 
 ### Backend
 - Express.js with TypeScript for the API
 - PostgreSQL database with Prisma ORM
 - JWT for authentication
 - Swagger for API documentation
-- Containerized with Docker
 
-## Getting Started
-
-### Running with Docker (Recommended)
+## Running with Docker
 
 The entire application can be run using Docker Compose:
 
 1. Make sure Docker and Docker Compose are installed on your system.
 
-2. Clone the repository and navigate to the project directory.
-
-3. Run the following command to build and start all services:
+2. Build and start all services:
    ```
    docker-compose up -d
    ```
 
-4. The application will be available at:
-   - Frontend: http://localhost
+3. The application will be available at:
+   - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000
    - API Documentation: http://localhost:3000/api-docs
    - PostgreSQL: localhost:5434 (if you need to connect externally)
 
-5. To stop the containers:
+4. To stop the containers:
    ```
    docker-compose down
    ```
-
-6. To completely reset (including database data):
-   ```
-   docker-compose down -v
-   docker-compose up -d
-   ```
-
-### Local Development
-
-#### Backend Development
-
-1. Navigate to the backend directory:
-   ```
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Create a `.env` file with the following content:
-   ```
-   PORT=3000
-   NODE_ENV=development
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/taskmanagement?schema=public
-   JWT_SECRET=your-secret-key-for-jwt-tokens
-   JWT_REFRESH_SECRET=your-refresh-token-secret
-   JWT_EXPIRES_IN=1h
-   JWT_REFRESH_EXPIRES_IN=7d
-   ```
-
-4. Set up the database:
-   ```
-   npx prisma migrate dev --name init
-   ```
-
-5. Start the backend:
-   ```
-   npm run dev
-   ```
-
-#### Frontend Development
-
-1. Navigate to the frontend directory:
-   ```
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Start the frontend development server:
-   ```
-   npm run dev
-   ```
-
-4. The frontend will be available at http://localhost:5173
 
 ## Application Features
 
@@ -137,28 +72,10 @@ The entire application can be run using Docker Compose:
 
 For detailed API documentation, visit the Swagger docs at http://localhost:3000/api-docs when the backend is running.
 
-## Dockerization
-
-The application is fully containerized using Docker:
-
-1. **Frontend Container**:
-   - Multi-stage build for optimized production image
-   - Nginx for serving static files and API proxying
-   - Configuration for Single Page Application routing
-
-2. **Backend Container**:
-   - Node.js application with TypeScript
-   - Automatic database migrations at startup
-   - Health checks to ensure availability
-
-3. **PostgreSQL Container**:
-   - Persistent volume for data storage
-   - Health checks to verify database availability
-
 ## Project Structure
 
 ```
-task-management/
+user-auth/
 ├── backend/
 │   ├── prisma/
 │   │   ├── migrations/
@@ -169,6 +86,7 @@ task-management/
 │   │   ├── routes/
 │   │   ├── utils/
 │   │   └── index.ts
+│   ├── .env
 │   ├── Dockerfile
 │   └── package.json
 ├── frontend/
@@ -178,8 +96,8 @@ task-management/
 │   │   ├── services/
 │   │   ├── store/
 │   │   └── App.tsx
+│   ├── .env
 │   ├── Dockerfile
-│   ├── nginx.conf
 │   └── package.json
 ├── docker-compose.yml
 └── README.md

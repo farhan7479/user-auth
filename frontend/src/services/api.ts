@@ -2,12 +2,20 @@ import axios from 'axios';
 import { store } from '../store';
 import { logout, refreshTokens } from '../store/slices/authSlice';
 
-// Set up axios defaults
-// We're not setting a baseURL here because Vite's proxy will handle it
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+// Create a custom axios instance with the correct baseURL
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  withCredentials: true
+});
+
+// Log configuration for debugging
+console.log('API base URL:', apiClient.defaults.baseURL);
 
 // Add a request interceptor
-axios.interceptors.request.use(
+apiClient.interceptors.request.use(
   (config) => {
     const token = store.getState().auth.token;
     
@@ -21,9 +29,11 @@ axios.interceptors.request.use(
 );
 
 // Add a response interceptor
-axios.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.error('API Error:', error.response?.status, error.response?.data);
+    
     const originalRequest = error.config;
     
     // If the error is 401 Unauthorized and we haven't retried yet
@@ -40,7 +50,7 @@ axios.interceptors.response.use(
         if (newToken) {
           // Update the header and retry the request
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return axios(originalRequest);
+          return apiClient(originalRequest);
         }
       } catch (refreshError) {
         // If refresh token also fails, logout
@@ -53,4 +63,4 @@ axios.interceptors.response.use(
   }
 );
 
-export default axios;
+export default apiClient;
