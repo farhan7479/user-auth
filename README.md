@@ -2,7 +2,15 @@
 
 A full-stack application where users can log in and manage tasks. This application features user authentication, CRUD operations on tasks, and is fully Dockerized for easy deployment.
 
-## Technologies Used
+## Features
+
+- User authentication (register, login, JWT token)
+- Task management (create, read, update, delete)
+- Task status categories (To Do, In Progress, Done)
+- Dockerized backend and frontend for easy deployment
+- PostgreSQL database with Prisma ORM
+
+## Tech Stack
 
 ### Frontend
 - React with TypeScript
@@ -13,52 +21,105 @@ A full-stack application where users can log in and manage tasks. This applicati
 - Vite for fast development
 
 ### Backend
-- Express.js with TypeScript for the API
-- PostgreSQL database with Prisma ORM
+- Express.js with TypeScript
+- PostgreSQL database
+- Prisma ORM for database access
 - JWT for authentication
-- Swagger for API documentation
+- Swagger documentation for the API
 
-## Running with Docker
+## Running the Application
 
-The entire application can be run using Docker Compose:
+### Using Docker (Recommended)
 
 1. Make sure Docker and Docker Compose are installed on your system.
 
-2. Build and start all services:
-   ```
+2. Clone the repository and navigate to the project directory.
+
+3. Start all services with Docker Compose:
+   ```bash
    docker-compose up -d
    ```
 
-3. The application will be available at:
+4. Access the application:
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000
    - API Documentation: http://localhost:3000/api-docs
-   - PostgreSQL: localhost:5434 (if you need to connect externally)
 
-4. To stop the containers:
-   ```
+5. To stop the containers:
+   ```bash
    docker-compose down
    ```
 
-## Application Features
+6. To view logs:
+   ```bash
+   # View all logs
+   docker-compose logs
 
-### Authentication
-- User registration and login
-- JWT-based authentication with refresh tokens
-- Secure password hashing
-- Protected routes
+   # View backend logs
+   docker-compose logs backend
 
-### Task Management
-- Create, read, update, and delete tasks
-- Filter tasks by status (Todo, In Progress, Done)
-- Responsive and intuitive UI
+   # View frontend logs
+   docker-compose logs react-frontend
+
+   # View database logs
+   docker-compose logs postgres
+   ```
+
+### Local Development Setup
+
+For developing without Docker:
+
+#### Backend
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` to configure your database connection.
+
+4. Run Prisma migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Start the backend server:
+   ```bash
+   npm run dev
+   ```
+
+#### Frontend
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
 ## API Endpoints
 
 ### Authentication
 
 - `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
+- `POST /api/auth/login` - Login user and get JWT token
 - `POST /api/auth/refresh-token` - Refresh JWT token
 - `GET /api/auth/profile` - Get user profile (requires authentication)
 
@@ -70,7 +131,7 @@ The entire application can be run using Docker Compose:
 - `PUT /api/tasks/:id` - Update a task (requires authentication)
 - `DELETE /api/tasks/:id` - Delete a task (requires authentication)
 
-For detailed API documentation, visit the Swagger docs at http://localhost:3000/api-docs when the backend is running.
+For detailed API documentation, visit Swagger at http://localhost:3000/api-docs when the backend is running.
 
 ## Project Structure
 
@@ -93,12 +154,45 @@ user-auth/
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
-│   │   ├── services/
 │   │   ├── store/
-│   │   └── App.tsx
+│   │   │   └── slices/
+│   │   ├── App.tsx
+│   │   └── main.tsx
 │   ├── .env
 │   ├── Dockerfile
 │   └── package.json
 ├── docker-compose.yml
 └── README.md
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Issues**:
+   - Check the PostgreSQL container is running: `docker ps`
+   - Verify the connection string in backend's `.env` file
+   - For Docker setup, database host should be `postgres`
+
+2. **Backend Not Starting**:
+   - Check logs: `docker-compose logs backend`
+   - Ensure PostgreSQL is fully initialized before backend starts
+   - Verify all required environment variables are set
+
+3. **Frontend Not Connecting to Backend**:
+   - Check the API URL configuration in the frontend
+   - Ensure the backend is running and accessible
+   - Look for CORS errors in browser developer console
+
+4. **Authentication Problems**:
+   - JWT tokens might be expired; try logging in again
+   - Check if your user account exists in the database
+   - Ensure you're including the Authorization header with requests
+
+### Docker Commands
+
+- Rebuild containers: `docker-compose up -d --build`
+- View container status: `docker-compose ps`
+- Reset database: `docker-compose down -v` (removes volumes)
+- Access PostgreSQL: `docker-compose exec postgres psql -U postgres -d taskmanagement`
+- Access backend shell: `docker-compose exec backend sh`
