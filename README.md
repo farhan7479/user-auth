@@ -9,6 +9,7 @@ A full-stack application where users can log in and manage tasks. This applicati
 - Task status categories (To Do, In Progress, Done)
 - Dockerized backend and frontend for easy deployment
 - PostgreSQL database with Prisma ORM
+- Unit tests for backend API endpoints
 
 ## Tech Stack
 
@@ -26,6 +27,7 @@ A full-stack application where users can log in and manage tasks. This applicati
 - Prisma ORM for database access
 - JWT for authentication
 - Swagger documentation for the API
+- Jest for unit testing
 
 ## Running the Application
 
@@ -114,6 +116,27 @@ For developing without Docker:
    npm run dev
    ```
 
+## Running Tests
+
+The backend includes unit tests for API controllers using Jest.
+
+### Running the Tests
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Run the tests:
+   ```bash
+   npm test
+   ```
+
+3. To run tests in watch mode (automatically rerun on file changes):
+   ```bash
+   npm run test:watch
+   ```
+
 ## API Endpoints
 
 ### Authentication
@@ -146,9 +169,11 @@ user-auth/
 │   │   ├── middleware/
 │   │   ├── routes/
 │   │   ├── utils/
+│   │   ├── __tests__/        # Unit tests
 │   │   └── index.ts
 │   ├── .env
 │   ├── Dockerfile
+│   ├── jest.config.js
 │   └── package.json
 ├── frontend/
 │   ├── src/
@@ -188,6 +213,11 @@ user-auth/
    - JWT tokens might be expired; try logging in again
    - Check if your user account exists in the database
    - Ensure you're including the Authorization header with requests
+
+5. **Tests Failing**:
+   - Check if mocks are properly set up for dependencies
+   - Verify test environment is properly configured
+   - Check if any controllers have been modified
 
 ### Docker Commands
 
