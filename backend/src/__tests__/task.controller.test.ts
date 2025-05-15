@@ -3,6 +3,7 @@ import * as taskController from '../controllers/task.controller';
 import prisma from '../utils/prisma';
 import { ApiError } from '../middleware/error.middleware';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { TaskIdParam, CreateTaskRequestBody, UpdateTaskRequestBody } from '../types/task.types';
 
 // Mock dependencies
 jest.mock('../utils/prisma', () => ({
@@ -43,7 +44,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTasks(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<{}, {}, {}>,
         mockResponse as Response,
         mockNext
       );
@@ -65,7 +66,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTasks(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<{}, {}, {}>,
         mockResponse as Response,
         mockNext
       );
@@ -91,7 +92,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -110,7 +111,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -135,7 +136,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -159,7 +160,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -181,7 +182,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.createTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<{}, {}, CreateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -195,11 +196,11 @@ describe('Task Controller', () => {
 
     it('should return 400 if title is missing', async () => {
       // Arrange
-      mockRequest.body = {};
+      mockRequest.body = { title: '' } as CreateTaskRequestBody;
 
       // Act
       await taskController.createTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<{}, {}, CreateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -217,7 +218,8 @@ describe('Task Controller', () => {
         title: 'New Task',
         description: 'Task description',
         status: 'TODO',
-      };
+      } as CreateTaskRequestBody;
+      
       const createdTask = {
         id: 'task-123',
         title: 'New Task',
@@ -229,7 +231,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.createTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<{}, {}, CreateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -261,7 +263,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam, {}, UpdateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -281,7 +283,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam, {}, UpdateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -304,7 +306,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam, {}, UpdateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -319,7 +321,7 @@ describe('Task Controller', () => {
     it('should update task and return 200', async () => {
       // Arrange
       mockRequest.params = { id: 'task-123' };
-      mockRequest.body = { title: 'Updated Task', status: 'IN_PROGRESS' };
+      mockRequest.body = { title: 'Updated Task', status: 'IN_PROGRESS' } as UpdateTaskRequestBody;
       const existingTask = {
         id: 'task-123',
         title: 'Old Title',
@@ -337,7 +339,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam, {}, UpdateTaskRequestBody>,
         mockResponse as Response,
         mockNext
       );
@@ -368,7 +370,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -387,7 +389,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -409,7 +411,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -431,7 +433,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as AuthRequest,
+        mockRequest as AuthRequest<TaskIdParam>,
         mockResponse as Response,
         mockNext
       );
@@ -444,6 +446,7 @@ describe('Task Controller', () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
         message: 'Task deleted successfully',
+        data: null,
       });
     });
   });

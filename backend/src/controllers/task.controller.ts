@@ -2,6 +2,13 @@ import { Response, NextFunction } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { ApiError } from '../middleware/error.middleware';
+import { 
+  CreateTaskRequestBody, 
+  UpdateTaskRequestBody, 
+  TaskResponse, 
+  TaskIdParam 
+} from '../types/task.types';
+import { ApiSuccessResponse } from '../types/auth.types';
 
 /**
  * Get all tasks for the authenticated user
@@ -19,10 +26,12 @@ export const getTasks = async (req: AuthRequest, res: Response, next: NextFuncti
       orderBy: { createdAt: 'desc' },
     });
 
-    res.status(200).json({
+    const response: ApiSuccessResponse<TaskResponse[]> = {
       success: true,
-      data: tasks,
-    });
+      data: tasks
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -31,7 +40,7 @@ export const getTasks = async (req: AuthRequest, res: Response, next: NextFuncti
 /**
  * Get a specific task by ID
  */
-export const getTaskById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getTaskById = async (req: AuthRequest<TaskIdParam>, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const userId = req.user?.userId;
@@ -53,10 +62,12 @@ export const getTaskById = async (req: AuthRequest, res: Response, next: NextFun
       throw new ApiError(403, 'You do not have permission to access this task');
     }
 
-    res.status(200).json({
+    const response: ApiSuccessResponse<TaskResponse> = {
       success: true,
-      data: task,
-    });
+      data: task
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -65,7 +76,7 @@ export const getTaskById = async (req: AuthRequest, res: Response, next: NextFun
 /**
  * Create a new task
  */
-export const createTask = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const createTask = async (req: AuthRequest<{}, {}, CreateTaskRequestBody>, res: Response, next: NextFunction) => {
   try {
     const { title, description, status } = req.body;
     const userId = req.user?.userId;
@@ -87,11 +98,13 @@ export const createTask = async (req: AuthRequest, res: Response, next: NextFunc
       },
     });
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<TaskResponse> = {
       success: true,
       message: 'Task created successfully',
-      data: task,
-    });
+      data: task
+    };
+    
+    res.status(201).json(response);
   } catch (error) {
     next(error);
   }
@@ -100,7 +113,7 @@ export const createTask = async (req: AuthRequest, res: Response, next: NextFunc
 /**
  * Update an existing task
  */
-export const updateTask = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateTask = async (req: AuthRequest<TaskIdParam, {}, UpdateTaskRequestBody>, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { title, description, status } = req.body;
@@ -133,11 +146,13 @@ export const updateTask = async (req: AuthRequest, res: Response, next: NextFunc
       },
     });
 
-    res.status(200).json({
+    const response: ApiSuccessResponse<TaskResponse> = {
       success: true,
       message: 'Task updated successfully',
-      data: updatedTask,
-    });
+      data: updatedTask
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -146,7 +161,7 @@ export const updateTask = async (req: AuthRequest, res: Response, next: NextFunc
 /**
  * Delete a task
  */
-export const deleteTask = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const deleteTask = async (req: AuthRequest<TaskIdParam>, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const userId = req.user?.userId;
@@ -173,10 +188,13 @@ export const deleteTask = async (req: AuthRequest, res: Response, next: NextFunc
       where: { id },
     });
 
-    res.status(200).json({
+    const response: ApiSuccessResponse<null> = {
       success: true,
       message: 'Task deleted successfully',
-    });
+      data: null
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }

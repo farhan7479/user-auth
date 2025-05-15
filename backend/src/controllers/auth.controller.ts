@@ -3,11 +3,21 @@ import bcrypt from 'bcrypt';
 import prisma from '../utils/prisma';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { ApiError } from '../middleware/error.middleware';
+import { AuthRequest } from '../middleware/auth.middleware';
+import { 
+  RegisterRequestBody, 
+  LoginRequestBody, 
+  RefreshTokenRequestBody,
+  UserResponse, 
+  AuthResponse, 
+  TokenResponse,
+  ApiSuccessResponse
+} from '../types/auth.types';
 
 /**
  * Register a new user
  */
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request<{}, {}, RegisterRequestBody>, res: Response, next: NextFunction) => {
   try {
     console.log('Register request:', req.body);
     
@@ -45,11 +55,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     console.log('User created:', newUser);
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<UserResponse> = {
       success: true,
       message: 'User registered successfully',
-      data: newUser,
-    });
+      data: newUser
+    };
+    
+    res.status(201).json(response);
   } catch (error) {
     console.error('Registration error:', error);
     next(error);
@@ -59,7 +71,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 /**
  * Login user
  */
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: Request<{}, {}, LoginRequestBody>, res: Response, next: NextFunction) => {
   try {
     console.log('Login request:', req.body);
     
@@ -88,19 +100,25 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     console.log('User logged in:', { id: user.id, email: user.email });
 
-    res.status(200).json({
+    const userData: UserResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name
+    };
+    
+    const authData: AuthResponse = {
+      user: userData,
+      accessToken,
+      refreshToken
+    };
+    
+    const response: ApiSuccessResponse<AuthResponse> = {
       success: true,
       message: 'User logged in successfully',
-      data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        },
-        accessToken,
-        refreshToken,
-      },
-    });
+      data: authData
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Login error:', error);
     next(error);
@@ -110,7 +128,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 /**
  * Refresh token
  */
-export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshToken = async (req: Request<{}, {}, RefreshTokenRequestBody>, res: Response, next: NextFunction) => {
   try {
     const { refreshToken } = req.body;
 
@@ -131,14 +149,18 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     const newAccessToken = generateAccessToken({ userId: user.id, email: user.email });
     const newRefreshToken = generateRefreshToken({ userId: user.id, email: user.email });
 
-    res.status(200).json({
+    const tokenData: TokenResponse = {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    };
+    
+    const response: ApiSuccessResponse<TokenResponse> = {
       success: true,
       message: 'Tokens refreshed successfully',
-      data: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      },
-    });
+      data: tokenData
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Token refresh error:', error);
     next(error);
@@ -148,9 +170,8 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 /**
  * Get current user profile
  */
-export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const getProfile = async (req: AuthRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
   try {
-    // @ts-ignore - We're attaching user in the auth middleware
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -171,10 +192,12 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
       throw new ApiError(404, 'User not found');
     }
 
-    res.status(200).json({
+    const response: ApiSuccessResponse<UserResponse> = {
       success: true,
-      data: user,
-    });
+      data: user
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Get profile error:', error);
     next(error);
