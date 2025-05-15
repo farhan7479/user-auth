@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as taskController from '../controllers/task.controller';
 import prisma from '../utils/prisma';
 import { ApiError } from '../middleware/error.middleware';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 // Mock dependencies
 jest.mock('../utils/prisma', () => ({
@@ -15,14 +16,14 @@ jest.mock('../utils/prisma', () => ({
 }));
 
 describe('Task Controller', () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
 
   beforeEach(() => {
     mockRequest = {
       params: {},
-      user: { userId: 'user-123' },
+      user: { userId: 'user-123', email: 'test@example.com' },
     };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
@@ -42,7 +43,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTasks(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -64,7 +65,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTasks(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -90,7 +91,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -109,7 +110,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -134,7 +135,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -158,7 +159,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.getTaskById(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -180,7 +181,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.createTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -198,7 +199,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.createTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -228,7 +229,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.createTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -260,7 +261,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -280,7 +281,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -303,7 +304,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -336,7 +337,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.updateTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -347,6 +348,7 @@ describe('Task Controller', () => {
         data: {
           title: 'Updated Task',
           status: 'IN_PROGRESS',
+          description: 'Description',
         },
       });
       expect(mockResponse.status).toHaveBeenCalledWith(200);
@@ -366,7 +368,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -385,7 +387,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -407,7 +409,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -429,7 +431,7 @@ describe('Task Controller', () => {
 
       // Act
       await taskController.deleteTask(
-        mockRequest as any,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
