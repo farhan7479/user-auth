@@ -67,6 +67,9 @@ A full-stack application where users can log in and manage tasks. This applicati
    docker-compose logs postgres
    ```
 
+
+[Simple Test Instructions](./TEST-README.md)
+
 ### Local Development Setup
 
 For developing without Docker:
