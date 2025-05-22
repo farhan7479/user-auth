@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  test-postgres:
+    image: postgres:15-alpine
+    container_name: test-postgres
+    environment:
+      POSTGRES_DB: test_taskmanagement
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5436:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d test_taskmanagement"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  test-app:
+    build: .
+    container_name: test-app
+    environment:
+      DATABASE_URL: "postgresql://testuser:testpass@test-postgres:5432/test_taskmanagement?schema=public"
+      JWT_SECRET: "test-jwt-secret-key"
+      JWT_REFRESH_SECRET: "test-refresh-secret"
+      JWT_EXPIRES_IN: "1h"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      NODE_ENV: "test"
+      PORT: 3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      test-postgres:
+        condition: service_healthy
+    networks:
+      - test-network
+    command: >
+      sh -c "
+        npx prisma migrate deploy &&
+        npm start
+      "
+
+volumes:
+  test_postgres_data:
+
+networks:
+  test-network:
+    driver: bridge

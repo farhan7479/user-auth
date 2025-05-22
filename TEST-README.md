@@ -1,18 +1,27 @@
-# Task Management Application
+# Testing Setup & Commands
 
-## How to Run Tests
+## 🚀 Quick Setup
 
-### Run tests in the backend:
+### Prerequisites
+- Docker installed and running
+- Node.js installed
 
+### Install Dependencies
 ```bash
-cd backend
-npm test
+npm install
 ```
 
-### If using Docker:
+## 🧪 Integration Tests (Real Database)
 
 ```bash
-docker-compose exec backend npm test
+npm run test:integration:full
 ```
 
-That's it!
+## 🐳 Manual Database Commands (if needed)
+
+```bash
+npm run test:db:up              # Start test database
+npm run test:db:down            # Stop test database
+```
+
+That's it! 🎉
