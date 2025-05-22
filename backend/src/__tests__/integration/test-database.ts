@@ -1,21 +1,22 @@
 import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
 
-// Load test environment variables
-dotenv.config({ path: '.env.test' });
-
-// Create a separate Prisma client for testing
-const testPrisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
+// Create a separate test Prisma client that doesn't conflict with main app
+const createTestPrismaClient = () => {
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL || 'postgresql://testuser:testpass@localhost:5436/test_taskmanagement?schema=public',
+      },
     },
-  },
-});
+  });
+};
+
+let testPrisma: PrismaClient;
 
 export class TestDatabase {
   static async connect() {
     try {
+      testPrisma = createTestPrismaClient();
       await testPrisma.$connect();
       console.log('✅ Connected to test database');
     } catch (error) {
@@ -26,8 +27,10 @@ export class TestDatabase {
 
   static async disconnect() {
     try {
-      await testPrisma.$disconnect();
-      console.log('✅ Disconnected from test database');
+      if (testPrisma) {
+        await testPrisma.$disconnect();
+        console.log('✅ Disconnected from test database');
+      }
     } catch (error) {
       console.error('❌ Failed to disconnect from test database:', error);
       throw error;
@@ -36,6 +39,11 @@ export class TestDatabase {
 
   static async cleanup() {
     try {
+      if (!testPrisma) {
+        testPrisma = createTestPrismaClient();
+        await testPrisma.$connect();
+      }
+      
       // Delete all records in reverse order due to foreign key constraints
       await testPrisma.task.deleteMany({});
       await testPrisma.user.deleteMany({});
@@ -57,11 +65,15 @@ export class TestDatabase {
   }
 
   static getPrisma() {
+    if (!testPrisma) {
+      testPrisma = createTestPrismaClient();
+    }
     return testPrisma;
   }
 
   // Helper method to create test users
   static async createTestUser(userData = {}) {
+    const prisma = this.getPrisma();
     const defaultUser = {
       email: 'test@example.com',
       password: '$2b$10$YourHashedPasswordHere', // Pre-hashed for testing
@@ -69,7 +81,7 @@ export class TestDatabase {
       ...userData,
     };
 
-    return await testPrisma.user.create({
+    return await prisma.user.create({
       data: defaultUser,
       select: {
         id: true,
@@ -82,6 +94,7 @@ export class TestDatabase {
 
   // Helper method to create test tasks
   static async createTestTask(userId: string, taskData = {}) {
+    const prisma = this.getPrisma();
     const defaultTask = {
       title: 'Test Task',
       description: 'Test task description',
@@ -90,7 +103,7 @@ export class TestDatabase {
       ...taskData,
     };
 
-    return await testPrisma.task.create({
+    return await prisma.task.create({
       data: defaultTask,
     });
   }

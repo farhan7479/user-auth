@@ -1,11 +1,7 @@
+import { TaskStatus as PrismaTaskStatus } from '@prisma/client';
 
-
-// Define our own TaskStatus enum to match Prisma's
-export enum TaskStatus {
-  TODO = 'TODO',
-  IN_PROGRESS = 'IN_PROGRESS',
-  DONE = 'DONE'
-}
+// Use Prisma's generated TaskStatus enum
+export type TaskStatus = PrismaTaskStatus;
 
 // Request types
 export interface CreateTaskRequestBody {

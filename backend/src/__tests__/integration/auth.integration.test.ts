@@ -294,6 +294,9 @@ describe('🔐 Auth Integration Tests (Real Database)', () => {
     });
 
     it('should refresh tokens with valid refresh token', async () => {
+      console.log('🔍 Testing refresh token...');
+      console.log('Refresh token:', refreshToken);
+      
       const response = await request(app)
         .post('/api/auth/refresh-token')
         .send({ refreshToken })

@@ -9,7 +9,6 @@ module.exports = {
     }],
   },
   testMatch: ['**/__tests__/**/*.test.(ts|js)'],
-  testTimeout: 30000, // Increased for integration tests
   collectCoverageFrom: [
     'src/**/*.{ts,js}',
     '!src/**/*.d.ts',
@@ -25,7 +24,6 @@ module.exports = {
       preset: 'ts-jest',
       testEnvironment: 'node',
       testMatch: ['**/__tests__/**/!(integration)/*.test.(ts|js)'],
-      testTimeout: 10000,
       transform: {
         '^.+\\.(ts|tsx)$': ['ts-jest', {
           tsconfig: 'tsconfig.json',
@@ -37,12 +35,12 @@ module.exports = {
       preset: 'ts-jest',
       testEnvironment: 'node',
       testMatch: ['**/__tests__/integration/*.test.(ts|js)'],
-      testTimeout: 60000,
       transform: {
         '^.+\\.(ts|tsx)$': ['ts-jest', {
           tsconfig: 'tsconfig.json',
         }],
       },
+      setupFilesAfterEnv: ['<rootDir>/src/__tests__/integration/jest-setup.ts'],
     },
   ],
 };
